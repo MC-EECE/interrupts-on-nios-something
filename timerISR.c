@@ -19,12 +19,10 @@ void timerISR(void * context)
 {
 	volatile alt_u16 * count_ptr = (volatile alt_u16*)context;
 	volatile int * interval_timer_ptr = (int *) INTERVAL_TIMER_BASE;
-//	int * sw = (int*)SLIDER_SWITCHES_BASE;
-  	//volatile int * HEX_display_ptr = (int *) HEX3_HEX0_BASE;	// 16x2 character display
 
-	*(interval_timer_ptr) = 0; 										// clear the interrupt
+	*(interval_timer_ptr) = 0; 		// clear the interrupt
 	if (!paused) {
-		(*count_ptr) += 1;															// set global variable
+		(*count_ptr) += 1;			// set global variable
 	}
 
 	if (reset) {
@@ -33,12 +31,7 @@ void timerISR(void * context)
 	}
 
 	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *count_ptr);
-/*	if ((*sw) & 0x1) {
-	// Display the count on the HEX
-		seven_seg_hex((alt_u8*)HEX3_HEX0_BASE, *count_ptr, leading_zeros);
-	} else {
-		seven_seg_bcd((alt_u32*)HEX3_HEX0_BASE, *count_ptr, leading_zeros);
-	}*/
+
 	return;
 }
 

@@ -10,6 +10,7 @@
 extern alt_u8 paused;
 extern alt_u8 reset;
 extern alt_u8 last_key_pressed;
+extern volatile alt_u8 display_as_bcd;
 
 #ifdef ALT_ENHANCED_INTERRUPT_API_PRESENT
 void buttonISR(void* context)
@@ -39,6 +40,7 @@ void buttonISR(void* context, alt_u32 id)
     	last_key_pressed = 2;
     	break;
     case 0x8:
+    	display_as_bcd = !display_as_bcd;
     	last_key_pressed = 3;
     	break;
     }

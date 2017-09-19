@@ -3,6 +3,7 @@
 	<name>InterruptsNIOS</name>
 	<comment></comment>
 	<projects>
+		<project>InterruptsNIOS_bsp</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

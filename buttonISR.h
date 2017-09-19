@@ -1,8 +1,8 @@
 /*
  * buttonISR.h
  *
- *  Created on: Apr 18, 2015
- *      Author: brent.horine
+ *  Created on: 
+ *      Author: 
  */
 
 #ifndef BUTTONISR_H_

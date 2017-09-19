@@ -10,6 +10,7 @@
 
 void seven_seg_bcd(alt_u32* base, alt_u16 num, alt_u8 leading_zeros) {
 	alt_u8 bcd[4];// = {0, 0, 0, 0};
+	//alt_u16 num0, num1, num2, num3;
 	int i, j;
 
 	alt_u8 BCD_CODES[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x67};
@@ -41,6 +42,5 @@ void seven_seg_bcd(alt_u32* base, alt_u16 num, alt_u8 leading_zeros) {
 		}
 		k -= 8;
 	}
-	// Output the value by dereferencing the base address pointer
 	*(base) = bcd_total;
 }

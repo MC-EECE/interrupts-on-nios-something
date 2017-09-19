@@ -1,13 +1,17 @@
 /*
  * timerISR.h
  *
- *  Created on: Apr 18, 2015
- *      Author: brent.horine
+ *  Created on: 
+ *      Author: 
  */
 
 #ifndef TIMERISR_H_
 #define TIMERISR_H_
 
-void timerISR( );
+#ifdef ALT_ENHANCED_INTERRUPT_API_PRESENT
+void timerISR(void* context);
+#else
+void timerISR(void* context, alt_u32 id);
+#endif
 
 #endif /* TIMERISR_H_ */

@@ -17,6 +17,9 @@ void buttonISR(void* context, alt_u32 id)
     /* Cast context It is important that this be declared 
      * volatile to avoid unwanted compiler optimization.
      */
+	volatile int * KEY_ptr = (int *)PUSHBUTTONS_BASE;
+	volatile int * interval_timer_ptr = (int *)INTERVAL_TIMER_BASE;
+	int press;
 
     /* Store the value in the PUSHBUTTONS's edge capture register in *context. */
 
@@ -24,6 +27,25 @@ void buttonISR(void* context, alt_u32 id)
     IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PUSHBUTTONS_BASE, 0);
 
     /* Act upon the interrupt */
+    press = *(KEY_ptr + 3);
+    	*(KEY_ptr + 3) = 0xE;
+
+    	if (press & 0x2)
+    	{
+    		if (*(interval_timer_ptr + 1) = 0x7)
+    		{
+    			*(interval_timer_ptr + 1) = 0xB;
+    		}
+
+    		else if (*(interval_timer_ptr + 1) = 0xB)
+    		{
+    			*(interval_timer_ptr + 1) = 0x7;
+    		}
+    	}
+
+    	else if (press & 0x4)					// KEY2
+    		*(interval_timer_ptr + 1) = 0xB;
+    	else
 
     /*
      * Read the PIO to delay ISR exit. This is done to prevent a spurious

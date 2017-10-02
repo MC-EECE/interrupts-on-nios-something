@@ -28,22 +28,18 @@ void timerISR(void * context, alt_u32 id)
 	/* Cast context. It is important that this be declared
 	 * volatile to avoid unwanted compiler optimization.
 	 */
-	volatile int * interval_timer_ptr = (int *)INTERVAL_TIMER_BASE;		//Pointer to Timer Base Address
-	static int count=0;
-	int * count_ptr;
-
+	alt_u32* pCount = (alt_u32*)context;
 	/* clear the interrupt */
-	*(interval_timer_ptr)=0x0;
+	IOWR(INTERVAL_TIMER_BASE, 0, 1);
 
 	/* Act upon the interrupt */
-	count++;
-	*count_ptr=count;
+	*pCount = *pCount + 1;
 
 	/* Display count value 
 	 * (Is this the best place to do this? 
 	 * Why or why not?) 
 	 */
-	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *count_ptr);
+	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *pCount);
 
 	return;
 }

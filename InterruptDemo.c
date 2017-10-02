@@ -14,7 +14,7 @@ int main(void)
     /* Setup */
 	volatile int *interval_timer_ptr = (int*) INTERVAL_TIMER_BASE;
 	volatile int *KEY_ptr = (int*) PUSHBUTTONS_BASE;
-	static int counter = 0x2FAF080;
+	static int counter = 0x2FAF080;//Counter Working, 50000000
 
     /* Initialize Variables */
 	alt_u32 *pCount;

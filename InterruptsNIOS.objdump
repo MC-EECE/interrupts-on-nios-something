@@ -908,7 +908,7 @@ void HexDisplay(alt_u32 * base, alt_u16 num) {
  * int main()                                                                  *
  *                                                                             *
  ******************************************************************************/
-volatile alt_u8 display_as_bcd;
+volatile alt_u8 display_as_bcd;		//Declaration of the variable used to toggle between HEX and BCD, "volatile" has to be declared outside of function
 int main(void)
 { 
      358:	defffd04 	addi	sp,sp,-12
@@ -918,32 +918,32 @@ int main(void)
     /* Setup */
 
     /* Initialize Variables */
-	alt_u32 *pCount;
-	static alt_u32 count = 0;
-	pCount = &count;
+	alt_u32 *pCount;				//Pointer to count variable
+	static alt_u32 count = 0;		//Static declaration of count variable so it isn't overwritten
+	pCount = &count;				//Assigning the address of count to pCount
      368:	d0a67004 	addi	r2,gp,-26176
      36c:	e0bfff15 	stw	r2,-4(fp)
 
-	display_as_bcd = 1;
+	display_as_bcd = 1;				//Assigning 1 as initial value
      370:	00800034 	movhi	r2,0
      374:	109e1804 	addi	r2,r2,30816
      378:	00c00044 	movi	r3,1
      37c:	10c00005 	stb	r3,0(r2)
     /* Register ISRs */
 
-	alt_irq_register(INTERVAL_TIMER_IRQ, (void*) pCount, timerISR);
+	alt_irq_register(INTERVAL_TIMER_IRQ, (void*) pCount, timerISR);		//Registering timer interrupt service routine
      380:	01800034 	movhi	r6,0
      384:	31829604 	addi	r6,r6,2648
      388:	e17fff17 	ldw	r5,-4(fp)
      38c:	0009883a 	mov	r4,zero
      390:	0000c180 	call	c18 <alt_irq_register>
-	alt_irq_register(PUSHBUTTONS_IRQ, (void*) pCount, buttonISR);
+	alt_irq_register(PUSHBUTTONS_IRQ, (void*) pCount, buttonISR);		//Registering button interrupt service routine
      394:	01800034 	movhi	r6,0
      398:	3180fb04 	addi	r6,r6,1004
      39c:	e17fff17 	ldw	r5,-4(fp)
      3a0:	01000044 	movi	r4,1
      3a4:	0000c180 	call	c18 <alt_irq_register>
-	IOWR(PUSHBUTTONS_BASE, 2, 0xE);
+	IOWR(PUSHBUTTONS_BASE, 2, 0xE);										//Enabling push button interrupts
      3a8:	00c00384 	movi	r3,14
      3ac:	00840034 	movhi	r2,4096
      3b0:	10801604 	addi	r2,r2,88
@@ -951,17 +951,21 @@ int main(void)
 
 
     /* Initialize Timer */
-	IOWR(INTERVAL_TIMER_BASE, 2, 0xFFFF&INTERVAL_TIMER_FREQ);
+	IOWR(INTERVAL_TIMER_BASE, 2, 0xFFFF&INTERVAL_TIMER_FREQ);			//Writing the 16 least sig bits of the frequency to the interval timer counter start value (low)
      3b8:	00fc2014 	movui	r3,61568
      3bc:	00840034 	movhi	r2,4096
      3c0:	10880204 	addi	r2,r2,8200
      3c4:	10c00035 	stwio	r3,0(r2)
-	IOWR(INTERVAL_TIMER_BASE, 3, 0xFFFF&(INTERVAL_TIMER_FREQ >> 16));
+																		//the interval timer counter start value (low) to increment each second
+
+	IOWR(INTERVAL_TIMER_BASE, 3, 0xFFFF&(INTERVAL_TIMER_FREQ >> 16));	//Writing the 16 most sig bits of the frequency to the interval timer counter start value (low)
      3c8:	00c0be84 	movi	r3,762
      3cc:	00840034 	movhi	r2,4096
      3d0:	10880304 	addi	r2,r2,8204
      3d4:	10c00035 	stwio	r3,0(r2)
-	IOWR(INTERVAL_TIMER_BASE, 1, 0x7);
+																		//the interval timer counter start value (high) to increment each second
+
+	IOWR(INTERVAL_TIMER_BASE, 1, 0x7);									//Enabling the timer by writing 0111 to the control register
      3d8:	00c001c4 	movi	r3,7
      3dc:	00840034 	movhi	r2,4096
      3e0:	10880104 	addi	r2,r2,8196
@@ -986,19 +990,22 @@ void buttonISR(void* context, alt_u32 id)
      3f8:	df000504 	addi	fp,sp,20
      3fc:	e13ffe15 	stw	r4,-8(fp)
      400:	e17fff15 	stw	r5,-4(fp)
-	alt_u8 timer_setting;
+	alt_u8 timer_setting;	//Variable to be used for toggling clock on or off
+
     /* Cast context It is important that this be declared 
      * volatile to avoid unwanted compiler optimization.
      */
 	alt_u32* pCount = (alt_u32*)context;
      404:	e0bffe17 	ldw	r2,-8(fp)
      408:	e0bffc15 	stw	r2,-16(fp)
+
     /* Store the value in the PUSHBUTTONS's edge capture register in *context. */
 	alt_u8 button_pushed = IORD(PUSHBUTTONS_BASE, 3);
      40c:	00840034 	movhi	r2,4096
      410:	10801704 	addi	r2,r2,92
      414:	10800037 	ldwio	r2,0(r2)
      418:	e0bffd05 	stb	r2,-12(fp)
+
     /* Reset the PUSHBUTTONS's edge capture register. */
     IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PUSHBUTTONS_BASE, 0);
      41c:	0007883a 	mov	r3,zero
@@ -1015,53 +1022,53 @@ void buttonISR(void* context, alt_u32 id)
      43c:	18002f1e 	bne	r3,zero,4fc <buttonISR+0x110>
      440:	108000a0 	cmpeqi	r2,r2,2
      444:	1000011e 	bne	r2,zero,44c <buttonISR+0x60>
-    	LCD_cursor(0,1);
-    	LCD_text("Key 3 Pressed ...                 ");
+    	LCD_cursor(0,1);								//Placing cursor on bottom left block of LCD
+    	LCD_text("Key 3 Pressed ...                 ");	//Displaying message on the LCD
     	break;
 
-    default:
+    default:											//Default case in case any errors occur
     	break;
      448:	00003406 	br	51c <buttonISR+0x130>
     /* Act upon the interrupt */
     switch (button_pushed){
 
-    case KEY1:
+    case KEY1: //KEY1 is the second bit in the edge capture register, and is represented by 0x2
 
-    	timer_setting = IORD(INTERVAL_TIMER_BASE, 1);
+    	timer_setting = IORD(INTERVAL_TIMER_BASE, 1);	//Assigning current timer state to timer_setting
      44c:	00840034 	movhi	r2,4096
      450:	10880104 	addi	r2,r2,8196
      454:	10800037 	ldwio	r2,0(r2)
      458:	e0bffb05 	stb	r2,-20(fp)
-    	if (timer_setting&0x8){
+    	if (timer_setting&0x8){							//Checking if timer is off
      45c:	e0bffb03 	ldbu	r2,-20(fp)
      460:	1080020c 	andi	r2,r2,8
      464:	10000926 	beq	r2,zero,48c <buttonISR+0xa0>
-    		timer_setting = Timer_On;
+    		timer_setting = Timer_On;					//If off, assigns activate value to timer_setting
      468:	008001c4 	movi	r2,7
      46c:	e0bffb05 	stb	r2,-20(fp)
-    		LCD_cursor(0,0);
+    		LCD_cursor(0,0);							//Placing cursor on top left block of LCD
      470:	000b883a 	mov	r5,zero
      474:	0009883a 	mov	r4,zero
      478:	00005400 	call	540 <LCD_cursor>
-    		LCD_text("Timer Running ...           ");
+    		LCD_text("Timer Running ...           ");	//Displaying message on the LCD
      47c:	01000034 	movhi	r4,0
      480:	2110ca04 	addi	r4,r4,17192
      484:	00005ac0 	call	5ac <LCD_text>
      488:	00000806 	br	4ac <buttonISR+0xc0>
-    	} else {
-    		timer_setting = Timer_Off;
+    	} else {										//Checking if timer is on
+    		timer_setting = Timer_Off;					//If on, assigns deactivate value to timer_setting
      48c:	008002c4 	movi	r2,11
      490:	e0bffb05 	stb	r2,-20(fp)
-    		LCD_cursor(0,0);
+    		LCD_cursor(0,0);							//Placing cursor on top left block of LCD
      494:	000b883a 	mov	r5,zero
      498:	0009883a 	mov	r4,zero
      49c:	00005400 	call	540 <LCD_cursor>
-    		LCD_text("Timer Paused ...            ");
+    		LCD_text("Timer Paused ...            ");	//Displaying message on the LCD
      4a0:	01000034 	movhi	r4,0
      4a4:	2110d204 	addi	r4,r4,17224
      4a8:	00005ac0 	call	5ac <LCD_text>
     	}
-    	IOWR(INTERVAL_TIMER_BASE, 1, timer_setting);
+    	IOWR(INTERVAL_TIMER_BASE, 1, timer_setting);	//Activating or deactivating timer based on previous checks
      4ac:	e0fffb03 	ldbu	r3,-20(fp)
      4b0:	00840034 	movhi	r2,4096
      4b4:	10880104 	addi	r2,r2,8196
@@ -1069,38 +1076,38 @@ void buttonISR(void* context, alt_u32 id)
     	break;
      4bc:	00001706 	br	51c <buttonISR+0x130>
 
-    case KEY2:
+    case KEY2:	//KEY2 is the third bit in the edge capture register, and is represented by 0x4
 
-    	*pCount = 0;
+    	*pCount = 0;									//Resetting counter by setting count to 0
      4c0:	e0bffc17 	ldw	r2,-16(fp)
      4c4:	10000015 	stw	zero,0(r2)
-    	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *pCount);
+    	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *pCount);	//Displaying count
      4c8:	e0bffc17 	ldw	r2,-16(fp)
      4cc:	10800017 	ldw	r2,0(r2)
      4d0:	100b883a 	mov	r5,r2
      4d4:	01040034 	movhi	r4,4096
      4d8:	21000804 	addi	r4,r4,32
      4dc:	00002c80 	call	2c8 <HexDisplay>
-    	LCD_cursor(0,1);
+    	LCD_cursor(0,1);								//Placing cursor on bottom left block of LCD
      4e0:	01400044 	movi	r5,1
      4e4:	0009883a 	mov	r4,zero
      4e8:	00005400 	call	540 <LCD_cursor>
-    	LCD_text("Key 2 Pressed ...                ");
+    	LCD_text("Key 2 Pressed ...                ");	//Displaying message on the LCD
      4ec:	01000034 	movhi	r4,0
      4f0:	2110da04 	addi	r4,r4,17256
      4f4:	00005ac0 	call	5ac <LCD_text>
     	break;
      4f8:	00000806 	br	51c <buttonISR+0x130>
 
-    case KEY3:
+    case KEY3:	//KEY3 is the third bit in the edge capture register, and is represented by 0x8
 
-    	toggleBCDHEX();
+    	toggleBCDHEX();									//Toggling whether the count should be displayed in BCD or HEX
      4fc:	00002840 	call	284 <toggleBCDHEX>
-    	LCD_cursor(0,1);
+    	LCD_cursor(0,1);								//Placing cursor on bottom left block of LCD
      500:	01400044 	movi	r5,1
      504:	0009883a 	mov	r4,zero
      508:	00005400 	call	540 <LCD_cursor>
-    	LCD_text("Key 3 Pressed ...                 ");
+    	LCD_text("Key 3 Pressed ...                 ");	//Displaying message on the LCD
      50c:	01000034 	movhi	r4,0
      510:	2110e304 	addi	r4,r4,17292
      514:	00005ac0 	call	5ac <LCD_text>
@@ -1626,14 +1633,14 @@ void timerISR(void * context, alt_u32 id)
      a70:	e0bffe17 	ldw	r2,-8(fp)
      a74:	e0bffd15 	stw	r2,-12(fp)
 	/* clear the interrupt */
-	IOWR(INTERVAL_TIMER_BASE, 0, 1);
+	IOWR(INTERVAL_TIMER_BASE, 0, 1); //Any value written to the status register clears the interrupt
      a78:	00c00044 	movi	r3,1
      a7c:	00840034 	movhi	r2,4096
      a80:	10880004 	addi	r2,r2,8192
      a84:	10c00035 	stwio	r3,0(r2)
 
 	/* Act upon the interrupt */
-	*pCount = *pCount + 1;
+	*pCount = *pCount + 1;			//Incrementing the counter
      a88:	e0bffd17 	ldw	r2,-12(fp)
      a8c:	10800017 	ldw	r2,0(r2)
      a90:	10c00044 	addi	r3,r2,1
@@ -1644,7 +1651,7 @@ void timerISR(void * context, alt_u32 id)
 	 * (Is this the best place to do this? 
 	 * Why or why not?) 
 	 */
-	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *pCount);
+	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *pCount);	/*Writing the count value to the HEX display,
      a9c:	e0bffd17 	ldw	r2,-12(fp)
      aa0:	10800017 	ldw	r2,0(r2)
      aa4:	10bfffcc 	andi	r2,r2,65535
@@ -1652,7 +1659,9 @@ void timerISR(void * context, alt_u32 id)
      aac:	01040034 	movhi	r4,4096
      ab0:	21000804 	addi	r4,r4,32
      ab4:	00002c80 	call	2c8 <HexDisplay>
-
+													  best practice says to do as little as necessary in an ISR,
+													  so the display should be done in the main program since interrupts could
+													  be disabled by a high priority function*/
 	return;
      ab8:	0001883a 	nop
 }

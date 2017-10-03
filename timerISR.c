@@ -30,17 +30,19 @@ void timerISR(void * context, alt_u32 id)
 	 */
 	alt_u32* pCount = (alt_u32*)context;
 	/* clear the interrupt */
-	IOWR(INTERVAL_TIMER_BASE, 0, 1);
+	IOWR(INTERVAL_TIMER_BASE, 0, 1); //Any value written to the status register clears the interrupt
 
 	/* Act upon the interrupt */
-	*pCount = *pCount + 1;
+	*pCount = *pCount + 1;			//Incrementing the counter
 
 	/* Display count value 
 	 * (Is this the best place to do this? 
 	 * Why or why not?) 
 	 */
-	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *pCount);
-
+	HexDisplay((alt_u32*)HEX3_HEX0_BASE, *pCount);	/*Writing the count value to the HEX display,
+													  best practice says to do as little as necessary in an ISR,
+													  so the display should be done in the main program since interrupts could
+													  be disabled by a high priority function*/
 	return;
 }
 

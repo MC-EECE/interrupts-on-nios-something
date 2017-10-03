@@ -3,27 +3,28 @@
 #include "system.h"
 #include "alt_types.h"
 #include "timerISR.h"
+#include "buttonISR.h"
+
 
 /*******************************************************************************
  * int main()                                                                  *
  *                                                                             *
  ******************************************************************************/
-
+volatile alt_u8 display_as_bcd;
 int main(void)
 { 
     /* Setup */
-	volatile int *interval_timer_ptr = (int*) INTERVAL_TIMER_BASE;
-	volatile int *KEY_ptr = (int*) PUSHBUTTONS_BASE;
-	static int counter = 0x2FAF080;//Counter Working, 50000000
 
     /* Initialize Variables */
 	alt_u32 *pCount;
 	static alt_u32 count = 0;
 	pCount = &count;
 
+	display_as_bcd = 1;
     /* Register ISRs */
 
 	alt_irq_register(INTERVAL_TIMER_IRQ, (void*) pCount, timerISR);
+	alt_irq_register(PUSHBUTTONS_IRQ, (void*) pCount, buttonISR);
 	IOWR(PUSHBUTTONS_BASE, 2, 0xE);
 
 

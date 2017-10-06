@@ -29,10 +29,10 @@ int main(void)
 
 
     /* Initialize Timer */
-	IOWR(INTERVAL_TIMER_BASE, 2, 0xFFFF&INTERVAL_TIMER_FREQ);			//Writing the 16 least sig bits of the frequency to the interval timer counter start value (low)
+	IOWR(INTERVAL_TIMER_BASE, 2, 0xFFFF&INTERVAL_TIMER_FREQ);			//Writing the 16 least significant bits of the frequency to the interval timer counter start value (low)
 																		//the interval timer counter start value (low) to increment each second
 
-	IOWR(INTERVAL_TIMER_BASE, 3, 0xFFFF&(INTERVAL_TIMER_FREQ >> 16));	//Writing the 16 most sig bits of the frequency to the interval timer counter start value (low)
+	IOWR(INTERVAL_TIMER_BASE, 3, 0xFFFF&(INTERVAL_TIMER_FREQ >> 16));	//Writing the 16 most significant bits of the frequency to the interval timer counter start value (high)
 																		//the interval timer counter start value (high) to increment each second
 
 	IOWR(INTERVAL_TIMER_BASE, 1, 0x7);									//Enabling the timer by writing 0111 to the control register
